@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Regis.Pay.Application.Handlers;
+using Regis.Pay.Application.Metrics;
 
 namespace Regis.Pay.Application
 {
@@ -13,6 +14,8 @@ namespace Regis.Pay.Application
                         options.Assemblies = [typeof(CreatePaymentCommand)];
                     }
                 );
+
+            services.AddSingleton<IRegisPayMetrics, RegisPayMetrics>();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Mediator;
 using Microsoft.Extensions.Logging;
+using Regis.Pay.Application.Metrics;
 using Regis.Pay.Common.ApiClients.Notifications;
 using Regis.Pay.Domain;
 using System.Text.Json;
@@ -9,7 +10,8 @@ namespace Regis.Pay.Application.Handlers
     public class CompletePaymentCommandHandler(
             IPaymentRepository paymentRepository,
             ILogger<CompletePaymentCommandHandler> logger,
-            INotificationsApi notificationsApi) : ICommandHandler<CompletePaymentCommand>
+            INotificationsApi notificationsApi,
+            IRegisPayMetrics metrics) : ICommandHandler<CompletePaymentCommand>
     {
         public async ValueTask<Unit> Handle(CompletePaymentCommand command, CancellationToken cancellationToken)
         {
@@ -26,6 +28,10 @@ namespace Regis.Pay.Application.Handlers
             payment.Complete();
 
             await paymentRepository.SaveAsync(payment, cancellationToken);
+
+            var diff = DateTime.UtcNow - payment.PaymentInitiatedTimestamp;
+
+            metrics.CompletedDuration(diff.TotalMilliseconds);
 
             return Unit.Value;
         }

@@ -9,6 +9,7 @@ namespace Regis.Pay.Domain
         public bool IsSettled { get; private set; }
         public bool IsCompleted { get; private set; }
 
+        public DateTime PaymentInitiatedTimestamp { get; private set; }
         public Guid PaymentId { get; private set; }
         public decimal Amount { get; private set; }
         public string Currency { get; private set; }
@@ -26,7 +27,8 @@ namespace Regis.Pay.Domain
             {
                 PaymentId = paymentId,
                 Amount = amount,
-                Currency = currency
+                Currency = currency,
+                CreatedDateTimestamp = DateTime.UtcNow,
             });
         }
 
@@ -47,6 +49,7 @@ namespace Regis.Pay.Domain
 
         public void When(PaymentInitiated @event)
         {
+            PaymentInitiatedTimestamp = @event.CreatedDateTimestamp;
             PaymentId = @event.PaymentId;
             Amount = @event.Amount;
             Currency = @event.Currency;

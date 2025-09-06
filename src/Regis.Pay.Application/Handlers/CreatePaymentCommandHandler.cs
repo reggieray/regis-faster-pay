@@ -1,5 +1,6 @@
 ﻿using Mediator;
 using Microsoft.Extensions.Logging;
+using Regis.Pay.Application.Metrics;
 using Regis.Pay.Common.ApiClients.Payments;
 using Regis.Pay.Domain;
 
@@ -8,7 +9,8 @@ namespace Regis.Pay.Application.Handlers
     public class CreatePaymentCommandHandler(
             IPaymentRepository paymentRepository,
             ILogger<CreatePaymentCommandHandler> logger,
-            IPaymentsApi paymentsApi) : ICommandHandler<CreatePaymentCommand>
+            IPaymentsApi paymentsApi,
+            IRegisPayMetrics metrics) : ICommandHandler<CreatePaymentCommand>
     {
         public async ValueTask<Unit> Handle(CreatePaymentCommand command, CancellationToken cancellationToken)
         {
@@ -25,6 +27,10 @@ namespace Regis.Pay.Application.Handlers
             payment.Created(reponse.Content!.PaymentId);
 
             await paymentRepository.SaveAsync(payment, cancellationToken);
+
+            var diff = DateTime.UtcNow - payment.PaymentInitiatedTimestamp;
+
+            metrics.CreatedDuration(diff.TotalMilliseconds);
 
             return Unit.Value;
         }

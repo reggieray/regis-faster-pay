@@ -58,7 +58,8 @@ public static class Extensions
             {
                 metrics.AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
-                    .AddRuntimeInstrumentation();
+                    .AddRuntimeInstrumentation()
+                    .AddMeter("Regis.Pay.Metrics");
             })
             .WithTracing(tracing =>
             {

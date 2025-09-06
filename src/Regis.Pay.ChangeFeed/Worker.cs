@@ -31,6 +31,7 @@ namespace Regis.Pay.ChangeFeed
             var leaseContainer = _cosmosClient.GetContainer(_cosmosConfigOptions.DatabaseName, _cosmosConfigOptions.LeasesContainerName);
             ChangeFeedProcessor changeFeedProcessor = _cosmosClient.GetContainer(_cosmosConfigOptions.DatabaseName, _cosmosConfigOptions.ContainerName)
                 .GetChangeFeedProcessorBuilder<EventWrapper>(processorName: "eventsChangeFeed", onChangesDelegate: HandleChangesAsync)
+                    .WithMaxItems(100)
                     .WithInstanceName("Regis.Pay.ChangeFeed")
                     .WithLeaseContainer(leaseContainer)
                     .Build();
