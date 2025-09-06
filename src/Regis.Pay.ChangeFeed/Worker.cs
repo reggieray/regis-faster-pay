@@ -36,7 +36,7 @@ namespace Regis.Pay.ChangeFeed
                         .GetChangeFeedProcessorBuilder<EventWrapper>(
                             processorName: "eventsChangeFeed",
                             onChangesDelegate: HandleChangesAsync)
-                        .WithMaxItems(500)
+                        .WithMaxItems(1000)
                         .WithPollInterval(TimeSpan.FromMilliseconds(100))
                         .WithInstanceName("Regis.Pay.ChangeFeed")
                         .WithLeaseContainer(leaseContainer)
