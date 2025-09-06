@@ -5,6 +5,10 @@ namespace Regis.Pay.Domain
 {
     public class Payment : AggregateBase
     {
+        public bool IsCreated { get; private set; }
+        public bool IsSettled { get; private set; }
+        public bool IsCompleted { get; private set; }
+
         public Guid PaymentId { get; private set; }
         public decimal Amount { get; private set; }
         public string Currency { get; private set; }
@@ -50,16 +54,19 @@ namespace Regis.Pay.Domain
 
         public void When(PaymentCreated @event)
         {
+            IsCreated = true;
             PaymentCreatedTimestamp = @event.Timestamp;
             ThridPartyReference = @event.PaymentReference;
         }
 
         public void When(PaymentSettled @event) 
         {
+            IsSettled = true;
         }
 
         public void When(PaymentCompleted @event)
         {
+            IsCompleted = true;
             PaymentCompletedTimestamp = @event.Timestamp;
         }
     }

@@ -12,9 +12,9 @@ namespace Regis.Pay.Domain
             _eventStore = eventStore;
         }
 
-        public async Task<Payment> LoadAsync(string streamId)
+        public async Task<Payment> LoadAsync(string streamId, CancellationToken cancellationToken)
         {
-            var stream = await _eventStore.LoadStreamAsync(streamId);
+            var stream = await _eventStore.LoadStreamAsync(streamId, cancellationToken);
 
             if (stream is null)
             {
@@ -24,7 +24,7 @@ namespace Regis.Pay.Domain
             return new Payment(stream!.Events);
         }
 
-        public async Task<bool> SaveAsync(Payment payment)
+        public async Task<bool> SaveAsync(Payment payment, CancellationToken cancellationToken)
         {
             if (payment.Changes.Any())
             {
@@ -33,7 +33,7 @@ namespace Regis.Pay.Domain
                 return await _eventStore.AppendToStreamAsync(
                 streamId,
                 payment.Version,
-                payment.Changes);
+                payment.Changes, cancellationToken);
             }
 
             return true;
