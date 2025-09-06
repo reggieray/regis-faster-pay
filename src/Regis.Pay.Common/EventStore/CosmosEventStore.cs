@@ -17,7 +17,7 @@ namespace Regis.Pay.Common.EventStore
             _container = container;
         }
 
-        public async Task<EventStream> LoadStreamAsync(string streamId)
+        public async Task<EventStream> LoadStreamAsync(string streamId, CancellationToken cancellationToken)
         {
             var sqlQueryText = "SELECT * FROM events e"
                 + " WHERE e.stream.id = @streamId"
@@ -32,7 +32,7 @@ namespace Regis.Pay.Common.EventStore
             FeedIterator<EventWrapper> feedIterator = _container.GetItemQueryIterator<EventWrapper>(queryDefinition);
             while (feedIterator.HasMoreResults)
             {
-                FeedResponse<EventWrapper> response = await feedIterator.ReadNextAsync();
+                FeedResponse<EventWrapper> response = await feedIterator.ReadNextAsync(cancellationToken);
                 foreach (var eventWrapper in response)
                 {
                     version = eventWrapper.StreamInfo.Version;
@@ -44,7 +44,7 @@ namespace Regis.Pay.Common.EventStore
             return new EventStream(streamId, version, events);
         }
 
-        public async Task<bool> AppendToStreamAsync(string streamId, int expectedVersion, IEnumerable<IDomainEvent> events)
+        public async Task<bool> AppendToStreamAsync(string streamId, int expectedVersion, IEnumerable<IDomainEvent> events, CancellationToken cancellationToken)
         {
             var partitionKey = new PartitionKey(streamId);
 
@@ -55,7 +55,7 @@ namespace Regis.Pay.Common.EventStore
                 SerializeEvents(streamId, expectedVersion, events)
             ];
 
-            return await _container.Scripts.ExecuteStoredProcedureAsync<bool>("spAppendToStream", partitionKey, parameters);
+            return await _container.Scripts.ExecuteStoredProcedureAsync<bool>("spAppendToStream", partitionKey, parameters, cancellationToken: cancellationToken);
         }
 
         private static string SerializeEvents(string streamId, int expectedVersion, IEnumerable<IDomainEvent> events)

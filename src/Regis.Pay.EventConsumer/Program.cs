@@ -1,3 +1,4 @@
+using Regis.Pay.Application;
 using Regis.Pay.Common;
 using Regis.Pay.Domain;
 
@@ -10,6 +11,7 @@ internal class Program
         builder.Services.AddEventStore(builder.Configuration);
         builder.Services.AddMessagingBus(builder.Configuration, addConsumers: true);
         builder.Services.AddDomain();
+        builder.Services.AddApplication();
         builder.Services.AddCosmosDb(builder.Configuration);
         builder.Services.AddPaymentsApiClient(builder.Configuration);
         builder.Services.AddNotificationsApiClient(builder.Configuration);

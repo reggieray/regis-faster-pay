@@ -18,19 +18,30 @@ namespace Regis.Pay.ChangeFeed
 
         public async Task HandleAsync(IReadOnlyCollection<EventWrapper> events, CancellationToken cancellationToken)
         {
-            foreach (var @event in events)
+            var integrationEvents = events
+                    .Select(e =>
+                    {
+                        var ev = IntegrationEventResolver.Resolve(e);
+                        if (ev is null)
+                        {
+                            _logger.LogWarning("No integration event found for event {eventId}", e.Id);
+                        }
+                        return ev;
+                    })
+                    .Where(e => e is not null)
+                    .ToList();
+
+            if (integrationEvents.Any())
             {
-                _logger.LogInformation("Detected change feed {event} for {eventId}", @event.EventType, @event.Id);
-
-                var integrationEvent = IntegrationEventResolver.Resolve(@event);
-
-                if (integrationEvent is null)
+                const int batchSize = 500;
+                foreach (var batch in integrationEvents.Chunk(batchSize))
                 {
-                    _logger.LogInformation("No integration event found for event with {eventId}", @event.Id);
-                    break;
+                    await _bus.PublishBatch(batch!, cancellationToken);
                 }
-
-                await _bus.Publish(integrationEvent, cancellationToken);
+            }
+            else 
+            {
+                _logger.LogInformation("No integration events to publish");
             }
 
             _logger.LogInformation("Finished handling changes.");

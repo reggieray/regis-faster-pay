@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Regis.Pay.Application\Regis.Pay.Application.csproj" />
     <ProjectReference Include="..\Regis.Pay.Aspire\Regis.Pay.ServiceDefaults\Regis.Pay.ServiceDefaults.csproj" />
-    <ProjectReference Include="..\Regis.Pay.Domain\Regis.Pay.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

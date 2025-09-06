@@ -23,7 +23,7 @@ namespace Regis.Pay.Api.Endpoints.Create
         {
             var payment = new Payment(Guid.NewGuid(), req.Amount, req.Currency);
 
-            await _paymentRepository.SaveAsync(payment);
+            await _paymentRepository.SaveAsync(payment, ct);
 
             await SendAsync(new CreatePaymentResponse(payment.PaymentId), cancellation: ct);
         }

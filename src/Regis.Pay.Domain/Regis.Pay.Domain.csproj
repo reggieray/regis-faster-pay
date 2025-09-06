@@ -9,5 +9,5 @@
   <ItemGroup>
     <ProjectReference Include="..\Regis.Pay.Common\Regis.Pay.Common.csproj" />
   </ItemGroup>
-
+  
 </Project>

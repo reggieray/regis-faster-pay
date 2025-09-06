@@ -59,7 +59,7 @@ public class CreatePaymentScenarioTests
             var regisPayApi = new RegisPayApi();
             _createApiClient = regisPayApi.CreateClient();
 
-            regisPayApi.MockEventStore.Setup(x => x.AppendToStreamAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<IEnumerable<IDomainEvent>>()))
+            regisPayApi.MockEventStore.Setup(x => x.AppendToStreamAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<IEnumerable<IDomainEvent>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
         }
 

@@ -1,3 +1,5 @@
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
 using Regis.Pay.ChangeFeed;
 using Regis.Pay.Common;
 using Regis.Pay.Domain;

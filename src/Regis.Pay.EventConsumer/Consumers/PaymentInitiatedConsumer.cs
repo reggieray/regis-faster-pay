@@ -1,39 +1,37 @@
 ﻿using MassTransit;
-using Regis.Pay.Common.ApiClients.Payments;
-using Regis.Pay.Domain;
+using Regis.Pay.Application.Handlers;
+using Regis.Pay.Application.Metrics;
 using Regis.Pay.Domain.IntegrationEvents;
+using System.Diagnostics;
 
 namespace Regis.Pay.EventConsumer.Consumers
 {
     public class PaymentInitiatedConsumer : IConsumer<PaymentInitiated>
     {
-        private readonly IPaymentRepository _paymentRepository;
-        private readonly ILogger<PaymentInitiatedConsumer> _logger;
-        private readonly IPaymentsApi _paymentsApi;
+        private readonly Mediator.IMediator _mediator;
+        private readonly IRegisPayMetrics _metrics;
 
         public PaymentInitiatedConsumer(
-            IPaymentRepository paymentRepository,
-            ILogger<PaymentInitiatedConsumer> logger,
-            IPaymentsApi paymentsApi)
+            Mediator.IMediator mediator,
+            IRegisPayMetrics metrics)
         {
-            _paymentRepository = paymentRepository;
-            _logger = logger;
-            _paymentsApi = paymentsApi;
+            _mediator = mediator;
+            _metrics = metrics;
         }
 
         public async Task Consume(ConsumeContext<PaymentInitiated> context)
         {
-            _logger.LogInformation("Consuming {event} for paymentId: {paymentId}", nameof(PaymentInitiated), context.Message.AggregateId);
+            var sw = Stopwatch.StartNew();
 
-            var payment = await _paymentRepository.LoadAsync(context.Message.AggregateId);
+            await _mediator.Send(new CreatePaymentCommand(context.Message.AggregateId), context.CancellationToken);
 
-            var reponse = await _paymentsApi.CreatePaymentAsync(new CreatePaymentRequest(payment.Amount, payment.Currency));
+            await _mediator.Send(new SettlePaymentCommand(context.Message.AggregateId), context.CancellationToken);
 
-            await reponse.EnsureSuccessfulAsync();
+            await _mediator.Send(new CompletePaymentCommand(context.Message.AggregateId), context.CancellationToken);
 
-            payment.Created(reponse.Content!.PaymentId);
+            sw.Stop();
 
-            await _paymentRepository.SaveAsync(payment);
+            _metrics.PaymentInitiatedConsumerCriticalTime(sw.Elapsed.TotalMilliseconds);
         }
     }
 }
