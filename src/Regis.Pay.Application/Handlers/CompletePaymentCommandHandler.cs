@@ -31,7 +31,9 @@ namespace Regis.Pay.Application.Handlers
 
             var diff = DateTime.UtcNow - payment.PaymentInitiatedTimestamp;
 
-            metrics.CompletedDuration(diff.TotalMilliseconds);
+            metrics.CompletedCumulativeDuration(diff.TotalMilliseconds);
+
+            logger.LogInformation("Payment {PaymentId} processed in {Duration}ms", command.aggregateId, diff.TotalMilliseconds);
 
             return Unit.Value;
         }

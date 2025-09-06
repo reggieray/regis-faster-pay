@@ -21,7 +21,7 @@ namespace Regis.Pay.EventConsumer.Consumers
 
         public async Task Consume(ConsumeContext<PaymentInitiated> context)
         {
-            var stopwatch = Stopwatch.StartNew();
+            var sw = Stopwatch.StartNew();
 
             await _mediator.Send(new CreatePaymentCommand(context.Message.AggregateId), context.CancellationToken);
 
@@ -29,9 +29,9 @@ namespace Regis.Pay.EventConsumer.Consumers
 
             await _mediator.Send(new CompletePaymentCommand(context.Message.AggregateId), context.CancellationToken);
 
-            stopwatch.Stop();
+            sw.Stop();
 
-            _metrics.PaymentInitiatedConsumerCriticalTime(stopwatch.Elapsed.TotalMilliseconds);
+            _metrics.PaymentInitiatedConsumerCriticalTime(sw.Elapsed.TotalMilliseconds);
         }
     }
 }

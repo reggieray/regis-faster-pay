@@ -30,7 +30,7 @@ namespace Regis.Pay.Application.Handlers
 
             var diff = DateTime.UtcNow - payment.PaymentInitiatedTimestamp;
 
-            metrics.SettledDuration(diff.TotalMilliseconds);
+            metrics.SettledCumulativeDuration(diff.TotalMilliseconds);
 
             return Unit.Value;
         }

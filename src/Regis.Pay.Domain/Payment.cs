@@ -27,8 +27,7 @@ namespace Regis.Pay.Domain
             {
                 PaymentId = paymentId,
                 Amount = amount,
-                Currency = currency,
-                CreatedDateTimestamp = DateTime.UtcNow,
+                Currency = currency
             });
         }
 
@@ -49,7 +48,7 @@ namespace Regis.Pay.Domain
 
         public void When(PaymentInitiated @event)
         {
-            PaymentInitiatedTimestamp = @event.CreatedDateTimestamp;
+            PaymentInitiatedTimestamp = @event.Timestamp;
             PaymentId = @event.PaymentId;
             Amount = @event.Amount;
             Currency = @event.Currency;

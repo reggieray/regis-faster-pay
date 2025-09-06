@@ -24,7 +24,7 @@ public class PaymentLoadTests
             return response!.IsSuccessStatusCode ? Response.Ok(paymentId) : Response.Fail(paymentId);
         })
         .WithLoadSimulations(
-            Simulation.Inject(rate: 10,
+            Simulation.Inject(rate: 100,
                               interval: TimeSpan.FromSeconds(1),
                               during: TimeSpan.FromMinutes(3))
         );

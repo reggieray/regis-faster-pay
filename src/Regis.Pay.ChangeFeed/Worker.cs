@@ -29,12 +29,18 @@ namespace Regis.Pay.ChangeFeed
         private async Task<ChangeFeedProcessor> StartChangeFeedProcessorAsync()
         {
             var leaseContainer = _cosmosClient.GetContainer(_cosmosConfigOptions.DatabaseName, _cosmosConfigOptions.LeasesContainerName);
-            ChangeFeedProcessor changeFeedProcessor = _cosmosClient.GetContainer(_cosmosConfigOptions.DatabaseName, _cosmosConfigOptions.ContainerName)
-                .GetChangeFeedProcessorBuilder<EventWrapper>(processorName: "eventsChangeFeed", onChangesDelegate: HandleChangesAsync)
-                    .WithMaxItems(100)
-                    .WithInstanceName("Regis.Pay.ChangeFeed")
-                    .WithLeaseContainer(leaseContainer)
-                    .Build();
+
+            ChangeFeedProcessor changeFeedProcessor =
+                    _cosmosClient
+                        .GetContainer(_cosmosConfigOptions.DatabaseName, _cosmosConfigOptions.ContainerName)
+                        .GetChangeFeedProcessorBuilder<EventWrapper>(
+                            processorName: "eventsChangeFeed",
+                            onChangesDelegate: HandleChangesAsync)
+                        .WithMaxItems(500)
+                        .WithPollInterval(TimeSpan.FromMilliseconds(100))
+                        .WithInstanceName("Regis.Pay.ChangeFeed")
+                        .WithLeaseContainer(leaseContainer)
+                        .Build();
 
             _logger.LogInformation("Starting Change Feed Processor...");
             await changeFeedProcessor.StartAsync();
