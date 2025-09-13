@@ -18,7 +18,7 @@ The following changes were made:
 
 # Testing
 
-I'm going to use my own abbreviation `PPS`, which is short for `payments per second` to describe the tests below.
+I'm going to use my own abbreviation `PPS`, which is short for `payments per second` to describe the tests below. The scale on y-axis is numbers represented in milliseconds.
 
 1. `100 pps` - Too high a load, this created a build of payments that grew exponentially. As you can see the later payments took 60 seconds to process. 
 2. `50 pps` - Tried half the previous load and it seemed to cope just fine.
